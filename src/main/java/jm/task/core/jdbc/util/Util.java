@@ -1,8 +1,11 @@
 package jm.task.core.jdbc.util;
 
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
+
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLDataException;
 import java.sql.SQLException;
 
 public class Util {
@@ -11,11 +14,13 @@ public class Util {
     private static final String USER = "postgres";
     private static final String PASSWORD = "123";
 
-    public static Connection getConnection(){
+    public static SessionFactory sessionFactory;
+
+    public static Connection getConnection() {
         Connection connection = null;
         try {
             connection = DriverManager.getConnection(URL, USER, PASSWORD);
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return connection;
@@ -30,6 +35,25 @@ public class Util {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    static {
+        try {
+            sessionFactory = new Configuration().configure().buildSessionFactory();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static SessionFactory getSessionFactory(){
+        return sessionFactory;
+    }
+
+    public static void shutdownHibernate() {
+        if (sessionFactory != null) {
+            sessionFactory.close();
+            System.out.println("Сессия Hibernate закрыта.");
         }
     }
 }
